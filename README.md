@@ -110,7 +110,7 @@ appendices/
 quarto render
 ```
 
-## Split Typ workflow
+## Split Typst file workflow
 
 To generate a split Typst master file using `#include` directives:
 
@@ -121,13 +121,28 @@ just split
 To compile the split Typst output and move the PDF into `_book`:
 
 ```bash
+just compile
+```
+
+You can provide an output file name (with or without the `.pdf` extension):
+
+```bash
+just compile my-book
+just compile my-book.pdf
+```
+
+The `compile-typst` recipe provides the same behavior using `typst compile` directly:
+
+```bash
 just compile-typst
+just compile-typst my-book
 ```
 
 The split workflow:
 
 - Renders Quarto to `index.typ`
 - Splits `index.typ` into Typst fragments following `_quarto.yml` structure
+- Refactors generated Typ files to be more idiomatic for Typst, especially for equation blocks and cross-references
 - Generates `_split_typ/index-split.typ` with `#include` chain
 - Compiles `_split_typ/index-split.typ`
 - Mirrors `*_files` resource directories for relative assets
@@ -136,7 +151,7 @@ Main outputs:
 
 - `_split_typ/index-split.typ`
 - `_split_typ/book/*.typ`
-- `_book/index-split.pdf`
+- `_book/<output-name>.pdf` (default: `_book/index-split.pdf`)
 
 ## License
 

@@ -1,0 +1,140 @@
+---
+title: "Bookly Typst - Complete Template"
+subtitle: "Quarto extension usage example"
+author: "Your Name"
+date: today
+format:
+  bookly-typst:
+    lang: en
+    toc: true
+    lof: true
+    lot: true
+    theme: modern
+    tufte: false
+    fonts:
+      body: "Lato"
+      math: "Lete Sans Math"
+    part-numbering: "A"
+    config-options:
+      open-right: true
+      alt-margins: false
+    colors:
+      primary: "rgb(\"#1d90d0\")"
+      secondary: "rgb(\"#dddddd\").darken(15%)"
+execute:
+  echo: false
+---
+
+# What this file demonstrates
+
+This single file is a full showcase of the extension options and common book content.
+
+For real book projects, keep book structure in `_quarto.yml` and split content into multiple files.
+
+## Recommended _quarto.yml for a real book
+
+```yaml
+project:
+  type: book
+
+book:
+  title: "My Book"
+  author: "Your Name"
+  chapters:
+    - index.qmd
+    - part: "Part I"
+      chapters:
+        - chapters/intro.qmd
+        - chapters/methods.qmd
+    - part: "Part II"
+      chapters:
+        - chapters/results.qmd
+        - chapters/discussion.qmd
+  appendices:
+    - appendices/appendixA.qmd
+
+format:
+  bookly-typst:
+    lang: en
+    toc: true
+    lof: true
+    lot: true
+    theme: modern
+    tufte: false
+```
+
+## Section references
+
+See @sec-equations for equations, @sec-figures for figures, and @sec-tables for tables.
+
+## Callouts
+
+::: {.callout-note}
+## Note
+Bookly maps Quarto callouts to styled information boxes.
+:::
+
+::: {.callout-warning}
+## Warning
+Set fonts available on your system, otherwise Typst will fallback automatically.
+:::
+
+## Equations {#sec-equations}
+
+Inline math example: $a^2 + b^2 = c^2$.
+
+A numbered equation:
+
+$$
+\int_0^1 x^2 \, dx = \frac{1}{3}
+$$ {#eq-integral}
+
+You can reference Equation @eq-integral in your text.
+
+## Figures {#sec-figures}
+
+```{mermaid}
+%%| label: fig-flow
+%%| fig-cap: "Simple workflow rendered as a figure"
+flowchart LR
+  A[Write qmd files] --> B[quarto render]
+  B --> C[index.typ]
+  C --> D[_split_typ/index-split.typ]
+  D --> E[_book/output.pdf]
+```
+
+See Figure @fig-flow.
+
+## Tables {#sec-tables}
+
+| Option | Example value | Purpose |
+|---|---|---|
+| `theme` | `modern` | Select visual style |
+| `toc` | `true` | Show table of contents |
+| `part-numbering` | `"A"` | Part numbering style |
+
+: Example options table {#tbl-options}
+
+See Table @tbl-options.
+
+## Code blocks
+
+```python
+from math import sqrt
+
+values = [1, 4, 9]
+roots = [sqrt(v) for v in values]
+print(roots)
+```
+
+## Footnotes and links
+
+Bookly works with standard markdown features like footnotes.[^example-footnote]
+
+More info: [Quarto Typst docs](https://quarto.org/docs/output-formats/typst.html)
+
+[^example-footnote]: Footnotes are handled natively by Quarto + Typst.
+
+## Appendix-style heading example
+
+In a real book project, appendices should live in `appendices/*.qmd` and be declared under `book.appendices` in `_quarto.yml`.
