@@ -1,0 +1,9 @@
+_book/
+_split_typ/
+.quarto/
+appendices/
+chapters/
+index_files/
+.luarc.json
+index.qmd
+index.typ
