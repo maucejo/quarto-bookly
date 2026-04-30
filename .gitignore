@@ -9,3 +9,4 @@ index.qmd
 index.typ
 _quarto.yml
 .DS_Store
+/.luarc.json
