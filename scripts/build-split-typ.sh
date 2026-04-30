@@ -23,7 +23,7 @@ mkdir -p "$BOOK_DIR"
 
 cd "$ROOT_DIR"
 
-echo "[1/5] Render Quarto to index.typ (keep-typ=true)"
+echo "[1/6] Render Quarto to index.typ (keep-typ=true)"
 quarto render --to bookly-typst -M keep-typ:true >/dev/null
 
 if [[ ! -f "$INDEX_TYP" ]]; then
@@ -31,12 +31,51 @@ if [[ ! -f "$INDEX_TYP" ]]; then
   exit 1
 fi
 
+normalize_typst_idioms() {
+  local file="$1"
+
+  # Add automatic reference supplement behavior after the full bookly.with(...) block.
+  # We inject this once, only when not already present.
+  if /usr/bin/grep -q '^#show: bookly\.with(' "$file" && ! /usr/bin/grep -q '^#set ref(supplement: auto)' "$file"; then
+    local tmp="$file.tmp"
+    awk '
+      {
+        print $0
+        if ($0 ~ /^#show: bookly\.with\(/ && inserted == 0) {
+          in_bookly = 1
+          next
+        }
+        if (in_bookly == 1 && $0 ~ /^\)$/ && inserted == 0) {
+          print "#set ref(supplement: auto)"
+          inserted = 1
+          in_bookly = 0
+        }
+      }
+    ' "$file" > "$tmp"
+    mv "$tmp" "$file"
+  fi
+
+  # Convert Quarto's verbose display-equation form to idiomatic Typst math.
+  # Example:
+  #   #math.equation(..., [ $ E = mc^2 $ ])<eq-einstein>
+  # becomes:
+  #   $ E = mc^2 $<eq-einstein>
+  perl -i -pe 's/#math\.equation\(block: true, numbering: equation-numbering, \[ \$ (.*?) \$ \]\)<([^>]+)>/\$ $1 \$<$2>/g; s/#math\.equation\(block: true, numbering: equation-numbering, \[ \$ (.*?) \$ \]\)/\$ $1 \$/g' "$file"
+
+  # Convert verbose cross-references to Typst shorthand.
+  # Example: #ref(<eq-einstein>, supplement: [Equation]) -> @eq-einstein
+  perl -i -pe 's/#ref\(<([^>]+)>,\s*supplement:\s*\[[^\]]+\]\)/\@$1/g' "$file"
+}
+
+echo "[2/6] Normalize Typst idioms in index.typ"
+normalize_typst_idioms "$INDEX_TYP"
+
 tmp_entries="$OUT_DIR/.entries.tsv"
 tmp_starts="$OUT_DIR/.starts.tsv"
 : > "$tmp_entries"
 : > "$tmp_starts"
 
-echo "[2/5] Read structure (_quarto.yml + qmd titles)"
+echo "[3/6] Read structure (_quarto.yml + qmd titles)"
 
 part_idx=0
 while IFS= read -r line; do
@@ -68,7 +107,7 @@ while IFS= read -r line; do
   printf "QMD\t%s\t%s\t%s\n" "$qmd_path" "$heading" "$qmd_file" >> "$tmp_entries"
 done < <(grep -E '^[[:space:]]*-[[:space:]]*"?[^#"]+\.qmd"?[[:space:]]*$' "$QUARTO_CONFIG" || true)
 
-echo "[3/5] Locate content blocks in index.typ"
+echo "[4/6] Locate content blocks in index.typ"
 
 while IFS=$'\t' read -r kind a b c; do
   case "$kind" in
@@ -207,7 +246,7 @@ for res_dir in "$ROOT_DIR"/*_files; do
   done < <(find "$BOOK_DIR" -type f -name '*.typ' -exec dirname {} \; | sort -u)
 done
 
-echo "[4/5] Generate index-split.typ master with includes"
+echo "[5/6] Generate index-split.typ master with includes"
 cat "$BOOK_DIR/_preamble.typ" > "$MASTER_TYP"
 {
   echo ""
@@ -215,7 +254,7 @@ cat "$BOOK_DIR/_preamble.typ" > "$MASTER_TYP"
   awk -F '\t' '{ print "#include \"book/" $3 "\"" }' "$tmp_starts"
 } >> "$MASTER_TYP"
 
-echo "[5/5] Compile split master with Typst"
+echo "[6/6] Compile split master with Typst"
 rm -f "$MASTER_PDF"
 quarto typst compile "$MASTER_TYP" "$MASTER_PDF" >/dev/null
 echo "Compilation index-split.pdf: OK"

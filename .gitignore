@@ -1,6 +1,6 @@
 _book/
 _split_typ/
-.quarto/
+/.quarto/
 appendices/
 chapters/
 index_files/
@@ -10,3 +10,4 @@ index.typ
 _quarto.yml
 .DS_Store
 /.luarc.json
+**/*.quarto_ipynb
