@@ -102,7 +102,7 @@ appendices/
 ## Requirements
 
 - Quarto >= 1.9.17
-- Typst package `bookly:3.1.0` (resolved automatically by Typst)
+- Typst package `bookly:4.1.3` (resolved automatically by Typst)
 
 ## Render
 

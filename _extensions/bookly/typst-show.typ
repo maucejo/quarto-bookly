@@ -1,4 +1,4 @@
-#import "@preview/bookly:3.1.1": *
+#import "@preview/bookly:4.1.3": *
 
 #show: bookly.with(
 $if(title)$
