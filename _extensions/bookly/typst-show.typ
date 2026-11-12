@@ -195,6 +195,23 @@ $endif$
   }
 }
 
+// Images never exceed the text area: scale down (never up) when too large.
+// Inside figures, images are often wrapped in an auto-sized box (e.g. Mermaid
+// diagrams), so the fitting box spans the full width; inline images elsewhere
+// (callout icons...) are left alone.
+#let fit-image(it) = layout(size => {
+  // Natural size (explicit absolute sizes are not clamped without a width).
+  // Relative widths (e.g. 30%) resolve to 0 or infinity here: they already fit.
+  let m = measure(it)
+  if m.width <= 0pt or m.height <= 0pt or m.width > 1e5pt or m.height > 1e5pt { return it }
+  let r = calc.min(1, size.width / m.width, size.height * 0.9 / m.height)
+  if r < 1 { scale(r * 100%, reflow: true, it) } else { it }
+})
+#show figure: it => {
+  show image: img => box(width: 100%, fit-image(img))
+  it
+}
+
 #show figure.where(kind: "quarto-float-fig"): set figure(numbering: quarto-float-numbering)
 #show figure.where(kind: "quarto-float-tbl"): set figure(numbering: quarto-float-numbering)
 

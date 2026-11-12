@@ -21,6 +21,13 @@ format:
     colors:
       primary: "rgb(\"#1d90d0\")"
       secondary: "rgb(\"#dddddd\").darken(15%)"
+    title-page:
+      style: book
+      subtitle: "Quarto extension usage example"
+      edition: "First edition"
+      institution: "Your Institution"
+      series: "Your Series"
+      year: 2026
 execute:
   echo: false
 ---
