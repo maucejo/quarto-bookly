@@ -106,9 +106,92 @@ local header_filter = {
   end
 }
 
+-- ── Raw Typst metadata ──────────────────────────────────────────────────────
+-- Options such as colors.primary or config-options.<key> hold Typst code
+-- (e.g. rgb("#1d90d0").darken(15%)). Pandoc parses metadata strings as
+-- Markdown and escapes them when writing Typst (`#` → `\#`), which breaks
+-- compilation. Convert these values to raw Typst so they pass through as-is.
+-- A bare hex color ("#1d90d0") is accepted as a shortcut for rgb("#1d90d0").
+
+local function to_raw_typst(value)
+  local t = pandoc.utils.type(value)
+  if t ~= "Inlines" and t ~= "Blocks" and t ~= "string" then
+    return value -- booleans, lists, maps... are left untouched
+  end
+  local code
+  if t == "string" then
+    code = value
+  else
+    -- Undo smart-quote parsing (`"` → Quoted / curly quotes) and flatten
+    -- to plain text so nothing is escaped.
+    local blocks = t == "Blocks" and value or pandoc.Blocks({ pandoc.Plain(value) })
+    blocks = blocks:walk({
+      Quoted = function(q)
+        local mark = q.quotetype == "SingleQuote" and "'" or '"'
+        local out = pandoc.Inlines({ pandoc.Str(mark) })
+        out:extend(q.content)
+        out:insert(pandoc.Str(mark))
+        return out
+      end,
+      Str = function(s)
+        local txt = s.text:gsub("[“”]", '"'):gsub("[‘’]", "'")
+        return pandoc.Str(txt)
+      end,
+    })
+    code = pandoc.utils.stringify(blocks)
+  end
+  code = code:gsub("^%s+", ""):gsub("%s+$", "")
+  if code:match("^#%x+$") then
+    code = 'rgb("' .. code .. '")'
+  end
+  return pandoc.Inlines({ pandoc.RawInline("typst", code) })
+end
+
+local raw_typst_keys = {
+  "colors", "bookly-colors", "config-options", "bookly-config-options",
+}
+
+local meta_filter = {
+  Meta = function(meta)
+    if not quarto.doc.is_format("typst") then
+      return nil
+    end
+    for _, key in ipairs(raw_typst_keys) do
+      local map = meta[key]
+      if map ~= nil and pandoc.utils.type(map) == "table" then
+        for k, v in pairs(map) do
+          map[k] = to_raw_typst(v)
+        end
+        meta[key] = map
+      end
+    end
+
+    -- Title page: `bookly-title-page` is an alias of `title-page`.
+    -- `style: thesis` selects thesis-title-page (template needs a flag,
+    -- as Pandoc templates cannot compare strings); default is book.
+    local tp = meta["title-page"] or meta["bookly-title-page"]
+    if tp ~= nil and pandoc.utils.type(tp) == "table" then
+      local style = tp.style and pandoc.utils.stringify(tp.style) or "book"
+      tp.style = nil
+      if style == "thesis" then
+        tp.thesis = true
+      end
+      -- Paths and identifiers must not be Markdown-escaped
+      for _, k in ipairs({ "cover", "logo", "type" }) do
+        if tp[k] ~= nil then
+          tp[k] = to_raw_typst(tp[k])
+        end
+      end
+      meta["title-page"] = tp
+    end
+    return meta
+  end
+}
+
 -- Combine with file_metadata_filter so bookItemType is populated
 -- during this filter's document traversal
 return quarto.utils.combineFilters({
   quarto.utils.file_metadata_filter(),
-  header_filter
+  header_filter,
+  meta_filter
 })

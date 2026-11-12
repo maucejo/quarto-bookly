@@ -60,8 +60,8 @@ format:
 | `config-options.alt-margins` | `true` / `false` | `false` | Alternate recto/verso margins |
 | `part-numbering` | Typst numbering string (`"1"`, `"A"`, `"I"`, etc.) | bookly default | Part numbering style |
 | `config-options.<key>` | Typst value | — | Generic passthrough to `config-options` |
-| `colors.primary` | Typst color value | — | Primary color |
-| `colors.secondary` | Typst color value | — | Secondary color |
+| `colors.primary` | Typst color expression or hex string (`"#1d90d0"`) | — | Primary color |
+| `colors.secondary` | Typst color expression or hex string | — | Secondary color |
 | `fonts.body` | Typst font family name | bookly default | Body text font |
 | `fonts.math` | Typst font family name | bookly default | Math font |
 | `fonts.raw` | Typst font family name | bookly default | Raw/code font |
@@ -77,6 +77,52 @@ format:
       open-right: true
       alt-margins: false
       part-numbering: "A"
+```
+
+### Title page
+
+`title-page` (or its alias `bookly-title-page`) selects one of bookly's title pages with `style`. Without it, bookly's default title page is used. Other keys are the same as the Typst function's arguments.
+
+Book title page (`style: book`, the default) — arguments of `book-title-page`:
+
+```yaml
+format:
+  bookly-typst:
+    title-page:
+      subtitle: "Book subtitle"
+      edition: "First edition"
+      institution: "Institution"
+      series: "Discipline"
+      year: 2026
+      cover: images/cover.png
+      logo: images/logo.png
+      version-usage: "Version for personal use"
+      copyright: "All rights reserved"
+      show-cover-author: true
+```
+
+Thesis title page (`style: thesis`) — arguments of `thesis-title-page`:
+
+```yaml
+format:
+  bookly-typst:
+    title-page:
+      style: thesis
+      type: phd # or habilitation
+      school: "School name"
+      doctoral-school: "Doctoral school"
+      supervisor: ["Prof. A", "Dr. B"]
+      cosupervisor: "Dr. C"
+      laboratory: "Laboratory name"
+      defense-date: "1 January 2027"
+      discipline: "Discipline"
+      specialty: "Specialty"
+      logo: images/logo.png
+      committee:
+        - name: "Prof. D"
+          position: "Professor"
+          affiliation: "University"
+          role: "Reviewer"
 ```
 
 ## Generated book structure
