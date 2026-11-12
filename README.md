@@ -1,7 +1,7 @@
 # bookly-typst — Quarto extension for the Bookly Typst template
 
 [![Quarto](https://img.shields.io/badge/Quarto-%3E%3D1.9.17-blue)](https://quarto.org)
-[![bookly](https://img.shields.io/badge/bookly-3.1.0-cornflowerblue)](https://github.com/maucejo/bookly)
+[![bookly](https://img.shields.io/badge/bookly-5.3.0-cornflowerblue)](https://github.com/maucejo/bookly)
 [![License: MIT](https://img.shields.io/badge/License-MIT-forestgreen)](LICENSE)
 
 This Quarto extension lets you use the [bookly](https://github.com/maucejo/bookly) Typst package for book projects. It automatically handles parts, chapters, and appendices with chapter-based numbering.
