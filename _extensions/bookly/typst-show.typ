@@ -60,6 +60,69 @@ $endif$
   ),
 $endif$
 $endif$
+$if(title-page)$
+  title-page: default-title-page(
+$if(title-page.subtitle)$
+    subtitle: [$title-page.subtitle$],
+$endif$
+$if(title-page.edition)$
+    edition: [$title-page.edition$],
+$endif$
+$if(title-page.institution)$
+    institution: [$title-page.institution$],
+$endif$
+$if(title-page.series)$
+    series: [$title-page.series$],
+$endif$
+$if(title-page.year)$
+    year: [$title-page.year$],
+$endif$
+$if(title-page.cover)$
+    cover: image("$title-page.cover$"),
+$endif$
+$if(title-page.logo)$
+    logo: image("$title-page.logo$"),
+$endif$
+$if(title-page.version-usage)$
+    version-usage: [$title-page.version-usage$],
+$endif$
+$if(title-page.show-cover-author)$
+    show-cover-author: $title-page.show-cover-author$,
+$endif$
+  ),
+$else$
+$if(bookly-title-page)$
+  title-page: book-title-page(
+$if(bookly-title-page.subtitle)$
+    subtitle: [$bookly-title-page.subtitle$],
+$endif$
+$if(bookly-title-page.edition)$
+    edition: [$bookly-title-page.edition$],
+$endif$
+$if(bookly-title-page.institution)$
+    institution: [$bookly-title-page.institution$],
+$endif$
+$if(bookly-title-page.series)$
+    series: [$bookly-title-page.series$],
+$endif$
+$if(bookly-title-page.year)$
+    year: [$bookly-title-page.year$],
+$endif$
+$if(bookly-title-page.cover)$
+    cover: image("$bookly-title-page.cover$"),
+$endif$
+$if(bookly-title-page.logo)$
+    logo: image("$bookly-title-page.logo$"),
+$endif$
+$if(bookly-title-page.version-usage)$
+    version-usage: [$bookly-title-page.version-usage$],
+$endif$
+$if(bookly-title-page.show-cover-author)$
+    show-cover-author: $bookly-title-page.show-cover-author$,
+$endif$
+  ),
+$endif$
+$endif$
   config-options: (
 $if(config-options)$
 $for(config-options/pairs)$
